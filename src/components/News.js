@@ -274,6 +274,7 @@ export class News extends Component {
     this.state = {
       articles: [],
       loading: false,
+      page:1
     };
   } 
 
@@ -300,6 +301,10 @@ export class News extends Component {
               />
             </div>;
           })}
+        </div>
+        <div className="container d-flex justify-content-between">
+        <button type="button" class="btn btn-dark">Previous</button>
+        <button type="button" class="btn btn-dark">Next</button>
         </div>
       </div>
     );
