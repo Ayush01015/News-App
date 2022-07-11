@@ -3,7 +3,6 @@ import NewsItem from "./NewsItem";
 
 export class News extends Component {
   articles = [
-    
     {
       source: { id: null, name: "Yahoo Entertainment" },
       author: "Krysten Peek",
@@ -267,44 +266,91 @@ export class News extends Component {
     },
   ];
 
-  
   constructor() {
     super();
     // console.log("Hello i am the constructor from News class");
     this.state = {
       articles: [],
       loading: false,
-      page:1
+      page: 1,
     };
-  } 
-
-  async componentDidMount(){
-    let url="https://newsapi.org/v2/top-headlines?country=in&apiKey=2e24f858d2834c769f29f277a171121f";
-    const data=await fetch(url);
-    let parseData=await data.json();
-    this.setState({articles: parseData.articles})
-    console.log(this.state.articles);
   }
 
+  async componentDidMount() {
+    let url =
+      "https://newsapi.org/v2/top-headlines?country=in&apiKey=2e24f858d2834c769f29f277a171121f&page=1&pagesize=9";
+    const data = await fetch(url);
+    let parseData = await data.json();
+    this.setState({
+      articles: parseData.articles,
+      totalResults: parseData.totalResults,
+    });
+  }
+
+  handlePreviousClick = async () => {
+    console.log("Previous");
+    let url = `https://newsapi.org/v2/top-headlines?country=in&apiKey=2e24f858d2834c769f29f277a171121f&page=${
+      this.state.page - 1
+    }&pagesize=9`;
+    const data = await fetch(url);
+    let parseData = await data.json();
+    this.setState({
+      page: this.state.page - 1,
+      articles: parseData.articles,
+    });
+  };
+
+  handleNextClick = async () => {
+    console.log("Next");
+    if (this.state.page + 1 > Math.ceil(this.state.totalResults / 9)) {
+    } else {
+      console.log(this.state.totalResults);
+      let url = `https://newsapi.org/v2/top-headlines?country=in&apiKey=2e24f858d2834c769f29f277a171121f&page=${
+        this.state.page + 1
+      }&pagesize=9`;
+      const data = await fetch(url);
+      let parseData = await data.json();
+      this.setState({
+        page: this.state.page + 1,
+        articles: parseData.articles,
+      });
+    }
+  };
   render() {
     return (
       <div className="container my-5">
         <h2>NewsMonkey- Top Headlines</h2>
         <div className="row">
           {this.state.articles.map((element) => {
-            return <div className="col-md-4" key={element.url}>
-              <NewsItem
-                title={element.title?element.title:""}
-                description={element.description?element.description:""}
-                imgUrl={element.urlToImage}
-                newsUrl={element.url}
-              />
-            </div>;
+            return (
+              <div className="col-md-4" key={element.url}>
+                <NewsItem
+                  title={element.title ? element.title : ""}
+                  description={element.description ? element.description : ""}
+                  imgUrl={element.urlToImage}
+                  newsUrl={element.url}
+                />
+              </div>
+            );
           })}
         </div>
         <div className="container d-flex justify-content-between">
-        <button type="button" class="btn btn-dark">Previous</button>
-        <button type="button" class="btn btn-dark">Next</button>
+          <button
+            type="button"
+            disabled={this.state.page <= 1}
+            onClick={this.handlePreviousClick}
+            className="btn btn-dark"
+          >
+            &larr; Previous
+          </button>
+          <button
+            type="button"
+            onClick={this.handleNextClick}
+            className="btn btn-dark"
+            disabled={this.state.page + 1 > Math.ceil(this.state.totalResults / 9)}
+          >
+            Next &rarr;
+          </button>
         </div>
       </div>
     );
